@@ -5,6 +5,7 @@ import { Edit, ExternalLink, Calendar, Bot, FileText } from "lucide-react";
 
 interface AIEntry {
   id: string;
+  title: string;
   date: string;
   prompt: string;
   ai_tool_id: string;
@@ -32,17 +33,22 @@ export default function AIEntryCard({ entry, onEdit }: AIEntryCardProps) {
     <Card className="border border-border hover:shadow-soft transition-smooth group">
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
-          <div className="flex items-center space-x-3">
-            <div className="p-2 bg-primary/10 rounded-lg">
-              <Bot className="h-5 w-5 text-primary" />
-            </div>
-            <div>
-              <Badge variant="secondary" className="bg-loop-lime/20 text-loop-lime mb-2">
-                {entry.ai_tool_name || 'Unknown Tool'}
-              </Badge>
-              <div className="flex items-center text-sm text-muted-foreground">
-                <Calendar className="h-4 w-4 mr-1" />
-                {formatDate(entry.date)}
+          <div className="flex-1">
+            <h3 className="text-lg font-semibold text-foreground mb-3">
+              {entry.title}
+            </h3>
+            <div className="flex items-center space-x-3">
+              <div className="p-2 bg-primary/10 rounded-lg">
+                <Bot className="h-5 w-5 text-primary" />
+              </div>
+              <div>
+                <Badge variant="secondary" className="bg-loop-lime/20 text-loop-lime mb-2">
+                  {entry.ai_tool_name || 'Unknown Tool'}
+                </Badge>
+                <div className="flex items-center text-sm text-muted-foreground">
+                  <Calendar className="h-4 w-4 mr-1" />
+                  {formatDate(entry.date)}
+                </div>
               </div>
             </div>
           </div>
