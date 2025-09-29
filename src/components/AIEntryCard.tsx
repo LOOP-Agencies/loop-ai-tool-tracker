@@ -7,9 +7,11 @@ interface AIEntry {
   id: string;
   date: string;
   prompt: string;
-  aiTool: string;
-  projectDetails: string;
-  fileUrl: string;
+  ai_tool_id: string;
+  ai_tool_name?: string;
+  project_details: string;
+  file_url?: string;
+  user_id: string;
 }
 
 interface AIEntryCardProps {
@@ -17,7 +19,7 @@ interface AIEntryCardProps {
   onEdit: (entry: AIEntry) => void;
 }
 
-export const AIEntryCard = ({ entry, onEdit }: AIEntryCardProps) => {
+export default function AIEntryCard({ entry, onEdit }: AIEntryCardProps) {
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
@@ -27,7 +29,7 @@ export const AIEntryCard = ({ entry, onEdit }: AIEntryCardProps) => {
   };
 
   return (
-    <Card className="gradient-card border border-border hover:shadow-soft transition-smooth group">
+    <Card className="border border-border hover:shadow-soft transition-smooth group">
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
           <div className="flex items-center space-x-3">
@@ -35,8 +37,8 @@ export const AIEntryCard = ({ entry, onEdit }: AIEntryCardProps) => {
               <Bot className="h-5 w-5 text-primary" />
             </div>
             <div>
-              <Badge variant="secondary" className="mb-2">
-                {entry.aiTool}
+              <Badge variant="secondary" className="bg-loop-lime/20 text-loop-lime mb-2">
+                {entry.ai_tool_name || 'Unknown Tool'}
               </Badge>
               <div className="flex items-center text-sm text-muted-foreground">
                 <Calendar className="h-4 w-4 mr-1" />
@@ -53,11 +55,11 @@ export const AIEntryCard = ({ entry, onEdit }: AIEntryCardProps) => {
             >
               <Edit className="h-4 w-4" />
             </Button>
-            {entry.fileUrl && (
+            {entry.file_url && (
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => window.open(entry.fileUrl, '_blank')}
+                onClick={() => window.open(entry.file_url, '_blank')}
               >
                 <ExternalLink className="h-4 w-4" />
               </Button>
@@ -80,14 +82,14 @@ export const AIEntryCard = ({ entry, onEdit }: AIEntryCardProps) => {
         <div>
           <h4 className="font-medium text-foreground mb-2">Project Details</h4>
           <p className="text-sm text-muted-foreground">
-            {entry.projectDetails}
+            {entry.project_details}
           </p>
         </div>
         
-        {entry.fileUrl && (
+        {entry.file_url && (
           <div className="pt-2 border-t border-border">
             <a
-              href={entry.fileUrl}
+              href={entry.file_url}
               target="_blank"
               rel="noopener noreferrer"
               className="text-sm text-primary hover:text-primary/80 transition-smooth flex items-center"
@@ -100,4 +102,4 @@ export const AIEntryCard = ({ entry, onEdit }: AIEntryCardProps) => {
       </CardContent>
     </Card>
   );
-};
+}

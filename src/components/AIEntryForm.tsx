@@ -1,20 +1,29 @@
-import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { X, Save } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import React, { useState, useEffect } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { X } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 
+// Types
 interface AIEntry {
   id: string;
   date: string;
   prompt: string;
-  aiTool: string;
-  projectDetails: string;
-  fileUrl: string;
+  ai_tool_id: string;
+  project_details: string;
+  file_url?: string;
+}
+
+interface AITool {
+  id: string;
+  name: string;
+  description: string | null;
+  is_active: boolean;
 }
 
 interface AIEntryFormProps {
@@ -23,53 +32,63 @@ interface AIEntryFormProps {
   entry?: AIEntry;
 }
 
-const AI_TOOLS = [
-  "ChatGPT",
-  "Claude",
-  "Midjourney",
-  "DALL-E",
-  "Stable Diffusion",
-  "Runway ML",
-  "Copy.ai",
-  "Jasper",
-  "Canva AI",
-  "Adobe Firefly",
-  "Other"
-];
-
-export const AIEntryForm = ({ onClose, onSave, entry }: AIEntryFormProps) => {
-  const { toast } = useToast();
+export default function AIEntryForm({ onClose, onSave, entry }: AIEntryFormProps) {
+  const [aiTools, setAITools] = useState<AITool[]>([]);
+  const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState({
     date: entry?.date || new Date().toISOString().split('T')[0],
     prompt: entry?.prompt || '',
-    aiTool: entry?.aiTool || '',
-    projectDetails: entry?.projectDetails || '',
-    fileUrl: entry?.fileUrl || ''
+    ai_tool_id: entry?.ai_tool_id || '',
+    project_details: entry?.project_details || '',
+    file_url: entry?.file_url || '',
   });
+
+  useEffect(() => {
+    fetchAITools();
+  }, []);
+
+  const fetchAITools = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('ai_tools')
+        .select('*')
+        .eq('is_active', true)
+        .order('name');
+
+      if (error) throw error;
+      setAITools(data || []);
+    } catch (error: any) {
+      toast.error('Failed to load AI tools');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.prompt.trim() || !formData.aiTool || !formData.projectDetails.trim()) {
-      toast({
-        title: "Missing Information",
-        description: "Please fill in all required fields.",
-        variant: "destructive"
-      });
+    // Validation
+    if (!formData.date || !formData.prompt || !formData.ai_tool_id || !formData.project_details) {
+      toast.error('Please fill in all required fields');
       return;
     }
 
-    onSave(formData);
-    toast({
-      title: "Entry Saved",
-      description: "AI tool usage has been recorded successfully.",
+    // Save the entry
+    onSave({
+      date: formData.date,
+      prompt: formData.prompt,
+      ai_tool_id: formData.ai_tool_id,
+      project_details: formData.project_details,
+      file_url: formData.file_url || undefined,
     });
+
+    toast.success(entry ? 'Entry updated successfully!' : 'Entry added successfully!');
     onClose();
   };
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-      <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-glow">
+      <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
           <CardTitle className="text-xl font-semibold">
             {entry ? 'Edit AI Entry' : 'Add AI Tool Usage'}
@@ -81,39 +100,47 @@ export const AIEntryForm = ({ onClose, onSave, entry }: AIEntryFormProps) => {
         
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="space-y-2">
-              <Label htmlFor="date">Date *</Label>
-              <Input
-                id="date"
-                type="date"
-                value={formData.date}
-                onChange={(e) => setFormData(prev => ({ ...prev, date: e.target.value }))}
-                required
-              />
-            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="date">Date *</Label>
+                <Input
+                  id="date"
+                  type="date"
+                  value={formData.date}
+                  onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                  required
+                />
+              </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="aiTool">AI Tool Used *</Label>
-              <Select value={formData.aiTool} onValueChange={(value) => setFormData(prev => ({ ...prev, aiTool: value }))}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select an AI tool" />
-                </SelectTrigger>
-                <SelectContent>
-                  {AI_TOOLS.map((tool) => (
-                    <SelectItem key={tool} value={tool}>{tool}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <div className="space-y-2">
+                <Label htmlFor="aiTool">AI Tool *</Label>
+                <Select 
+                  value={formData.ai_tool_id} 
+                  onValueChange={(value) => setFormData({ ...formData, ai_tool_id: value })}
+                  disabled={loading}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder={loading ? "Loading tools..." : "Select an AI tool"} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {aiTools.map((tool) => (
+                      <SelectItem key={tool.id} value={tool.id}>
+                        {tool.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="prompt">Prompt Used *</Label>
               <Textarea
                 id="prompt"
-                placeholder="Enter the prompt you used with the AI tool..."
                 value={formData.prompt}
-                onChange={(e) => setFormData(prev => ({ ...prev, prompt: e.target.value }))}
-                rows={4}
+                onChange={(e) => setFormData({ ...formData, prompt: e.target.value })}
+                placeholder="Enter the prompt you used with the AI tool..."
+                className="min-h-[100px]"
                 required
               />
             </div>
@@ -122,31 +149,30 @@ export const AIEntryForm = ({ onClose, onSave, entry }: AIEntryFormProps) => {
               <Label htmlFor="projectDetails">Project Details *</Label>
               <Textarea
                 id="projectDetails"
-                placeholder="Describe the project context and what you created..."
-                value={formData.projectDetails}
-                onChange={(e) => setFormData(prev => ({ ...prev, projectDetails: e.target.value }))}
-                rows={3}
+                value={formData.project_details}
+                onChange={(e) => setFormData({ ...formData, project_details: e.target.value })}
+                placeholder="Describe the project context and how the AI tool was used..."
+                className="min-h-[100px]"
                 required
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="fileUrl">File URL (Optional)</Label>
+              <Label htmlFor="fileUrl">File URL (optional)</Label>
               <Input
                 id="fileUrl"
                 type="url"
-                placeholder="https://..."
-                value={formData.fileUrl}
-                onChange={(e) => setFormData(prev => ({ ...prev, fileUrl: e.target.value }))}
+                value={formData.file_url}
+                onChange={(e) => setFormData({ ...formData, file_url: e.target.value })}
+                placeholder="https://example.com/final-file"
               />
             </div>
 
-            <div className="flex justify-end space-x-3 pt-4">
-              <Button type="button" variant="outline" onClick={onClose}>
+            <div className="flex gap-3 pt-4">
+              <Button type="button" variant="outline" onClick={onClose} className="flex-1">
                 Cancel
               </Button>
-              <Button type="submit" className="transition-smooth hover:shadow-glow">
-                <Save className="h-4 w-4 mr-2" />
+              <Button type="submit" className="flex-1">
                 {entry ? 'Update Entry' : 'Save Entry'}
               </Button>
             </div>
@@ -155,4 +181,4 @@ export const AIEntryForm = ({ onClose, onSave, entry }: AIEntryFormProps) => {
       </Card>
     </div>
   );
-};
+}

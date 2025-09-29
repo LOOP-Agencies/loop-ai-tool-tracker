@@ -1,58 +1,187 @@
-import { useState, useEffect } from "react";
-import { Header } from "@/components/Header";
-import { AIEntryForm } from "@/components/AIEntryForm";
-import { AIEntryCard } from "@/components/AIEntryCard";
-import { StatsCards } from "@/components/StatsCards";
-import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search, Filter } from "lucide-react";
+import React, { useState, useEffect } from 'react';
+import { User, Session } from '@supabase/supabase-js';
+import { supabase } from '@/integrations/supabase/client';
+import Header from '@/components/Header';
+import AIEntryForm from '@/components/AIEntryForm';
+import AIEntryCard from '@/components/AIEntryCard';
+import StatsCards from '@/components/StatsCards';
+import AdminPanel from '@/components/AdminPanel';
+import AuthPage from '@/components/AuthPage';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useToast } from '@/components/ui/use-toast';
 
+// Types
 interface AIEntry {
   id: string;
   date: string;
   prompt: string;
-  aiTool: string;
-  projectDetails: string;
-  fileUrl: string;
+  ai_tool_id: string;
+  ai_tool_name?: string;
+  project_details: string;
+  file_url?: string;
+  user_id: string;
 }
 
-const Index = () => {
-  const [entries, setEntries] = useState<AIEntry[]>([]);
-  const [showForm, setShowForm] = useState(false);
-  const [editingEntry, setEditingEntry] = useState<AIEntry | undefined>();
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filterTool, setFilterTool] = useState<string>("all");
+interface AITool {
+  id: string;
+  name: string;
+  description: string | null;
+  is_active: boolean;
+}
 
-  // Load entries from localStorage on component mount
+export default function Index() {
+  const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [entries, setEntries] = useState<AIEntry[]>([]);
+  const [aiTools, setAITools] = useState<AITool[]>([]);
+  const [showForm, setShowForm] = useState(false);
+  const [showAdmin, setShowAdmin] = useState(false);
+  const [editingEntry, setEditingEntry] = useState<AIEntry | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterTool, setFilterTool] = useState('all');
+  const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
+
+  // Auth state management
   useEffect(() => {
-    const savedEntries = localStorage.getItem('ai-tool-entries');
-    if (savedEntries) {
-      setEntries(JSON.parse(savedEntries));
-    }
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        setSession(session);
+        setUser(session?.user ?? null);
+        
+        if (session?.user) {
+          setTimeout(() => {
+            checkAdminStatus(session.user.id);
+            fetchEntries();
+            fetchAITools();
+          }, 0);
+        } else {
+          setIsAdmin(false);
+          setEntries([]);
+          setAITools([]);
+        }
+        setLoading(false);
+      }
+    );
+
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      
+      if (session?.user) {
+        checkAdminStatus(session.user.id);
+        fetchEntries();
+        fetchAITools();
+      }
+      setLoading(false);
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
-  // Save entries to localStorage whenever entries change
-  useEffect(() => {
-    localStorage.setItem('ai-tool-entries', JSON.stringify(entries));
-  }, [entries]);
+  const checkAdminStatus = async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', userId)
+        .eq('role', 'admin')
+        .single();
 
-  const handleSaveEntry = (entryData: Omit<AIEntry, 'id'>) => {
-    if (editingEntry) {
-      // Update existing entry
-      setEntries(prev => prev.map(entry => 
-        entry.id === editingEntry.id 
-          ? { ...entryData, id: editingEntry.id }
-          : entry
-      ));
-    } else {
-      // Add new entry
-      const newEntry: AIEntry = {
-        ...entryData,
-        id: Date.now().toString()
-      };
-      setEntries(prev => [newEntry, ...prev]);
+      setIsAdmin(!error && data?.role === 'admin');
+    } catch (error) {
+      setIsAdmin(false);
     }
-    setEditingEntry(undefined);
+  };
+
+  const fetchEntries = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('ai_entries')
+        .select(`
+          *,
+          ai_tools:ai_tool_id (
+            name
+          )
+        `)
+        .order('date', { ascending: false });
+
+      if (error) throw error;
+      
+      const entriesWithToolNames = data?.map(entry => ({
+        ...entry,
+        ai_tool_name: entry.ai_tools?.name || 'Unknown Tool'
+      })) || [];
+      
+      setEntries(entriesWithToolNames);
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: "Failed to load entries",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const fetchAITools = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('ai_tools')
+        .select('*')
+        .eq('is_active', true)
+        .order('name');
+
+      if (error) throw error;
+      setAITools(data || []);
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: "Failed to load AI tools",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleSaveEntry = async (entryData: Omit<AIEntry, 'id'>) => {
+    try {
+      if (editingEntry) {
+        // Update existing entry
+        const { error } = await supabase
+          .from('ai_entries')
+          .update({
+            date: entryData.date,
+            prompt: entryData.prompt,
+            ai_tool_id: entryData.ai_tool_id,
+            project_details: entryData.project_details,
+            file_url: entryData.file_url,
+          })
+          .eq('id', editingEntry.id);
+
+        if (error) throw error;
+        setEditingEntry(null);
+      } else {
+        // Add new entry
+        const { error } = await supabase
+          .from('ai_entries')
+          .insert([{
+            ...entryData,
+            user_id: user!.id,
+          }]);
+
+        if (error) throw error;
+      }
+
+      fetchEntries();
+      setShowForm(false);
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
   };
 
   const handleEditEntry = (entry: AIEntry) => {
@@ -60,55 +189,79 @@ const Index = () => {
     setShowForm(true);
   };
 
-  const handleCloseForm = () => {
-    setShowForm(false);
-    setEditingEntry(undefined);
+  const handleSignOut = async () => {
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
   };
 
-  // Get unique AI tools for filter
-  const uniqueTools = [...new Set(entries.map(entry => entry.aiTool))].sort();
-
-  // Filter entries based on search and tool filter
+  // Filter entries based on search term and selected tool
   const filteredEntries = entries.filter(entry => {
     const matchesSearch = 
       entry.prompt.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      entry.projectDetails.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      entry.aiTool.toLowerCase().includes(searchTerm.toLowerCase());
+      entry.project_details.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      entry.ai_tool_name?.toLowerCase().includes(searchTerm.toLowerCase());
     
-    const matchesFilter = filterTool === "all" || entry.aiTool === filterTool;
+    const matchesTool = filterTool === 'all' || entry.ai_tool_id === filterTool;
     
-    return matchesSearch && matchesFilter;
+    return matchesSearch && matchesTool;
   });
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <AuthPage />;
+  }
 
   return (
     <div className="min-h-screen bg-background">
-      <Header onAddEntry={() => setShowForm(true)} />
+      <Header 
+        onAddEntry={() => setShowForm(true)}
+        onShowAdmin={isAdmin ? () => setShowAdmin(true) : undefined}
+        onSignOut={handleSignOut}
+        isAdmin={isAdmin}
+        userName={user.user_metadata?.full_name || user.email}
+      />
       
       <main className="container mx-auto px-6 py-8">
+        {/* Stats Cards */}
         <StatsCards entries={entries} />
         
-        {/* Search and Filter Section */}
-        <div className="flex flex-col sm:flex-row gap-4 mb-6">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        {/* Search and Filter Controls */}
+        <div className="mb-8 flex flex-col sm:flex-row gap-4">
+          <div className="flex-1">
             <Input
-              placeholder="Search entries by prompt, project details, or AI tool..."
+              placeholder="Search entries..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
+              className="w-full"
             />
           </div>
-          
           <div className="w-full sm:w-48">
             <Select value={filterTool} onValueChange={setFilterTool}>
               <SelectTrigger>
-                <Filter className="h-4 w-4 mr-2" />
                 <SelectValue placeholder="Filter by tool" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Tools</SelectItem>
-                {uniqueTools.map((tool) => (
-                  <SelectItem key={tool} value={tool}>{tool}</SelectItem>
+                {aiTools.map((tool) => (
+                  <SelectItem key={tool.id} value={tool.id}>
+                    {tool.name}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -116,46 +269,49 @@ const Index = () => {
         </div>
 
         {/* Entries Grid */}
-        {filteredEntries.length === 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredEntries.map((entry) => (
+            <AIEntryCard
+              key={entry.id}
+              entry={entry}
+              onEdit={handleEditEntry}
+            />
+          ))}
+        </div>
+
+        {/* Empty State */}
+        {filteredEntries.length === 0 && (
           <div className="text-center py-12">
-            <div className="max-w-md mx-auto">
-              <div className="p-4 bg-muted/50 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
-                <Search className="h-8 w-8 text-muted-foreground" />
-              </div>
-              <h3 className="text-lg font-semibold text-foreground mb-2">
-                {entries.length === 0 ? "No AI entries yet" : "No matching entries"}
-              </h3>
-              <p className="text-muted-foreground mb-6">
-                {entries.length === 0 
-                  ? "Start tracking your AI tool usage by adding your first entry."
-                  : "Try adjusting your search terms or filters."
-                }
-              </p>
-            </div>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-            {filteredEntries.map((entry) => (
-              <AIEntryCard
-                key={entry.id}
-                entry={entry}
-                onEdit={handleEditEntry}
-              />
-            ))}
+            <p className="text-muted-foreground text-lg mb-4">
+              {searchTerm || filterTool !== 'all' 
+                ? 'No entries match your search criteria' 
+                : 'No AI tool entries yet'}
+            </p>
+            <p className="text-muted-foreground">
+              {searchTerm || filterTool !== 'all'
+                ? 'Try adjusting your search or filter settings'
+                : 'Click "Add Entry" to record your first AI tool usage'}
+            </p>
           </div>
         )}
       </main>
 
-      {/* Entry Form Modal */}
+      {/* Add/Edit Entry Form Modal */}
       {showForm && (
         <AIEntryForm
-          onClose={handleCloseForm}
+          onClose={() => {
+            setShowForm(false);
+            setEditingEntry(null);
+          }}
           onSave={handleSaveEntry}
-          entry={editingEntry}
+          entry={editingEntry || undefined}
         />
+      )}
+
+      {/* Admin Panel Modal */}
+      {showAdmin && isAdmin && (
+        <AdminPanel onClose={() => setShowAdmin(false)} />
       )}
     </div>
   );
-};
-
-export default Index;
+}
