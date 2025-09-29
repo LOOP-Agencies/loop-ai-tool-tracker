@@ -15,6 +15,7 @@ import { useToast } from '@/components/ui/use-toast';
 interface AIEntry {
   id: string;
   date: string;
+  title: string;
   prompt: string;
   ai_tool_id: string;
   ai_tool_name?: string;
@@ -154,6 +155,7 @@ export default function Index() {
           .from('ai_entries')
           .update({
             date: entryData.date,
+            title: entryData.title,
             prompt: entryData.prompt,
             ai_tool_id: entryData.ai_tool_id,
             project_details: entryData.project_details,

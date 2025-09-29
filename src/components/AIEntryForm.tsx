@@ -15,6 +15,7 @@ import { supabase } from '@/integrations/supabase/client';
 interface AIEntry {
   id: string;
   date: string;
+  title: string;
   prompt: string;
   ai_tool_id: string;
   project_details: string;
@@ -39,6 +40,7 @@ export default function AIEntryForm({ onClose, onSave, entry }: AIEntryFormProps
   const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState({
     date: entry?.date || new Date().toISOString().split('T')[0],
+    title: entry?.title || '',
     prompt: entry?.prompt || '',
     ai_tool_id: entry?.ai_tool_id || '',
     project_details: entry?.project_details || '',
@@ -73,7 +75,7 @@ export default function AIEntryForm({ onClose, onSave, entry }: AIEntryFormProps
     e.preventDefault();
     
     // Validation
-    if (!formData.date || !formData.prompt || !formData.ai_tool_id || !formData.project_details || !formData.file_url) {
+    if (!formData.date || !formData.title || !formData.prompt || !formData.ai_tool_id || !formData.project_details || !formData.file_url) {
       toast.error('Please fill in all required fields');
       return;
     }
@@ -86,6 +88,7 @@ export default function AIEntryForm({ onClose, onSave, entry }: AIEntryFormProps
     // Save the entry
     onSave({
       date: formData.date,
+      title: formData.title,
       prompt: formData.prompt,
       ai_tool_id: formData.ai_tool_id,
       project_details: formData.project_details,
