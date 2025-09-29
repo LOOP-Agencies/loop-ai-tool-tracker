@@ -31,17 +31,19 @@ interface AITool {
 }
 
 export default function Index() {
+  // State declarations - ensuring all are properly defined
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
-  const [isAdmin, setIsAdmin] = useState(false);
+  const [isAdmin, setIsAdmin] = useState<boolean>(false);
   const [entries, setEntries] = useState<AIEntry[]>([]);
   const [aiTools, setAITools] = useState<AITool[]>([]);
-  const [showForm, setShowForm] = useState(false);
-  const [showAdmin, setShowAdmin] = useState(false);
+  const [showForm, setShowForm] = useState<boolean>(false);
+  const [showAdmin, setShowAdmin] = useState<boolean>(false);
   const [editingEntry, setEditingEntry] = useState<AIEntry | null>(null);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterTool, setFilterTool] = useState('all');
-  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState<string>('');
+  const [filterTool, setFilterTool] = useState<string>('all');
+  const [loading, setLoading] = useState<boolean>(true);
+  
   const { toast } = useToast();
 
   // Auth state management
