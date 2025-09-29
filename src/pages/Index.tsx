@@ -115,6 +115,7 @@ export default function Index() {
       
       const entriesWithToolNames = data?.map(entry => ({
         ...entry,
+        title: entry.title || '', // Ensure title is never undefined
         ai_tool_name: entry.ai_tools?.name || 'Unknown Tool'
       })) || [];
       

@@ -147,13 +147,12 @@ export default function AIEntryForm({ onClose, onSave, entry }: AIEntryFormProps
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="prompt">Prompt Used *</Label>
-              <Textarea
-                id="prompt"
-                value={formData.prompt}
-                onChange={(e) => setFormData({ ...formData, prompt: e.target.value })}
-                placeholder="Enter the prompt you used with the AI tool..."
-                className="min-h-[100px]"
+              <Label htmlFor="title">Title *</Label>
+              <Input
+                id="title"
+                value={formData.title}
+                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                placeholder="Enter a title for this entry..."
                 required
               />
             </div>
@@ -165,6 +164,18 @@ export default function AIEntryForm({ onClose, onSave, entry }: AIEntryFormProps
                 value={formData.project_details}
                 onChange={(e) => setFormData({ ...formData, project_details: e.target.value })}
                 placeholder="Describe the project context and how the AI tool was used..."
+                className="min-h-[100px]"
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="prompt">Prompt Used *</Label>
+              <Textarea
+                id="prompt"
+                value={formData.prompt}
+                onChange={(e) => setFormData({ ...formData, prompt: e.target.value })}
+                placeholder="Enter the prompt you used with the AI tool..."
                 className="min-h-[100px]"
                 required
               />
