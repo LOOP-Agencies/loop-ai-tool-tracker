@@ -42,6 +42,7 @@ export default function AIEntryForm({ onClose, onSave, entry }: AIEntryFormProps
     ai_tool_id: entry?.ai_tool_id || '',
     project_details: entry?.project_details || '',
     file_url: entry?.file_url || '',
+    additional_tools: [] as string[],
   });
   const [loopToolsAgreement, setLoopToolsAgreement] = useState<boolean>(false);
 
@@ -70,7 +71,7 @@ export default function AIEntryForm({ onClose, onSave, entry }: AIEntryFormProps
     e.preventDefault();
     
     // Validation
-    if (!formData.date || !formData.prompt || !formData.ai_tool_id || !formData.project_details) {
+    if (!formData.date || !formData.prompt || !formData.ai_tool_id || !formData.project_details || !formData.file_url) {
       toast.error('Please fill in all required fields');
       return;
     }
@@ -165,13 +166,44 @@ export default function AIEntryForm({ onClose, onSave, entry }: AIEntryFormProps
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="fileUrl">File URL (optional)</Label>
+              <Label htmlFor="additionalTools">Additional Tools Used</Label>
+              <div className="space-y-2 max-h-32 overflow-y-auto border rounded-md p-3">
+                {aiTools.map((tool) => (
+                  <div key={tool.id} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={`additional-${tool.id}`}
+                      checked={formData.additional_tools.includes(tool.id)}
+                      onCheckedChange={(checked) => {
+                        if (checked) {
+                          setFormData({
+                            ...formData,
+                            additional_tools: [...formData.additional_tools, tool.id],
+                          });
+                        } else {
+                          setFormData({
+                            ...formData,
+                            additional_tools: formData.additional_tools.filter(id => id !== tool.id),
+                          });
+                        }
+                      }}
+                    />
+                    <Label htmlFor={`additional-${tool.id}`} className="text-sm">
+                      {tool.name}
+                    </Label>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="fileUrl">File URL *</Label>
               <Input
                 id="fileUrl"
                 type="url"
                 value={formData.file_url}
                 onChange={(e) => setFormData({ ...formData, file_url: e.target.value })}
                 placeholder="https://example.com/final-file"
+                required
               />
             </div>
 
