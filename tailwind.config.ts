@@ -13,7 +13,15 @@ export default {
       },
     },
     extend: {
+      fontFamily: {
+        inter: ['Inter', 'system-ui', 'sans-serif'],
+      },
       colors: {
+        'loop-lime': 'hsl(var(--loop-lime))',
+        'loop-charcoal': 'hsl(var(--loop-charcoal))',
+        'loop-light-gray': 'hsl(var(--loop-light-gray))',
+        'loop-medium-gray': 'hsl(var(--loop-medium-gray))',
+        'loop-dark-gray': 'hsl(var(--loop-dark-gray))',
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
