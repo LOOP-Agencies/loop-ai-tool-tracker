@@ -11,28 +11,30 @@ All colors MUST be HSL.
     /* LOOP Agencies Brand Colors */
     --loop-lime: 86 65% 65%;
     --loop-charcoal: 210 11% 15%;
-    --loop-light-gray: 210 20% 96%;
-    --loop-medium-gray: 210 8% 85%;
-    --loop-dark-gray: 210 11% 71%;
+    --loop-dark-bg: 210 11% 8%;
+    --loop-medium-bg: 210 11% 12%;
+    --loop-light-bg: 210 11% 18%;
+    --loop-border: 210 11% 25%;
+    --loop-text: 210 20% 85%;
     
     /* Base Colors */
-    --background: 0 0% 100%;
-    --foreground: var(--loop-charcoal);
+    --background: var(--loop-dark-bg);
+    --foreground: var(--loop-text);
 
-    --card: 0 0% 100%;
-    --card-foreground: var(--loop-charcoal);
+    --card: var(--loop-medium-bg);
+    --card-foreground: var(--loop-text);
 
-    --popover: 0 0% 100%;
-    --popover-foreground: var(--loop-charcoal);
+    --popover: var(--loop-medium-bg);
+    --popover-foreground: var(--loop-text);
 
     --primary: var(--loop-lime);
     --primary-foreground: var(--loop-charcoal);
 
-    --secondary: var(--loop-light-gray);
-    --secondary-foreground: var(--loop-charcoal);
+    --secondary: var(--loop-light-bg);
+    --secondary-foreground: var(--loop-text);
 
-    --muted: var(--loop-light-gray);
-    --muted-foreground: var(--loop-dark-gray);
+    --muted: var(--loop-light-bg);
+    --muted-foreground: 210 11% 65%;
 
     --accent: var(--loop-lime);
     --accent-foreground: var(--loop-charcoal);
@@ -40,8 +42,8 @@ All colors MUST be HSL.
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: var(--loop-medium-gray);
-    --input: var(--loop-medium-gray);
+    --border: var(--loop-border);
+    --input: var(--loop-light-bg);
     --ring: var(--loop-lime);
 
     --radius: 0.5rem;
@@ -76,10 +78,10 @@ All colors MUST be HSL.
     --primary: var(--loop-lime);
     --primary-foreground: var(--loop-charcoal);
 
-    --secondary: 217.2 32.6% 17.5%;
+    --secondary: 210 11% 20%;
     --secondary-foreground: 210 40% 98%;
 
-    --muted: 217.2 32.6% 17.5%;
+    --muted: 210 11% 20%;
     --muted-foreground: 215 20.2% 65.1%;
 
     --accent: var(--loop-lime);
@@ -88,8 +90,8 @@ All colors MUST be HSL.
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
+    --border: 210 11% 25%;
+    --input: 210 11% 20%;
     --ring: var(--loop-lime);
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
@@ -105,8 +107,8 @@ All colors MUST be HSL.
 /* Custom Gradients & Animations */
 :root {
   --gradient-hero: linear-gradient(135deg, hsl(var(--loop-lime)), hsl(var(--loop-lime) / 0.8));
-  --gradient-card: linear-gradient(145deg, hsl(var(--background)), hsl(var(--loop-light-gray) / 0.3));
-  --shadow-soft: 0 4px 20px -4px hsl(var(--loop-charcoal) / 0.1);
+  --gradient-card: linear-gradient(145deg, hsl(var(--loop-medium-bg)), hsl(var(--loop-light-bg)));
+  --shadow-soft: 0 4px 20px -4px hsl(0 0% 0% / 0.3);
   --shadow-glow: 0 0 30px hsl(var(--loop-lime) / 0.3);
   --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
