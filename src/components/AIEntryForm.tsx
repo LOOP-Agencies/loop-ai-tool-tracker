@@ -4,9 +4,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { X } from 'lucide-react';
+import { X, Plus } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -45,6 +46,7 @@ export default function AIEntryForm({ onClose, onSave, entry }: AIEntryFormProps
     additional_tools: [] as string[],
   });
   const [loopToolsAgreement, setLoopToolsAgreement] = useState<boolean>(false);
+  const [selectedAdditionalTool, setSelectedAdditionalTool] = useState<string>('');
 
   useEffect(() => {
     fetchAITools();
@@ -167,32 +169,67 @@ export default function AIEntryForm({ onClose, onSave, entry }: AIEntryFormProps
 
             <div className="space-y-2">
               <Label htmlFor="additionalTools">Additional Tools Used</Label>
-              <div className="space-y-2 max-h-32 overflow-y-auto border rounded-md p-3">
-                {aiTools.map((tool) => (
-                  <div key={tool.id} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={`additional-${tool.id}`}
-                      checked={formData.additional_tools.includes(tool.id)}
-                      onCheckedChange={(checked) => {
-                        if (checked) {
-                          setFormData({
-                            ...formData,
-                            additional_tools: [...formData.additional_tools, tool.id],
-                          });
-                        } else {
-                          setFormData({
-                            ...formData,
-                            additional_tools: formData.additional_tools.filter(id => id !== tool.id),
-                          });
-                        }
-                      }}
-                    />
-                    <Label htmlFor={`additional-${tool.id}`} className="text-sm">
-                      {tool.name}
-                    </Label>
-                  </div>
-                ))}
+              <div className="flex gap-2">
+                <Select 
+                  value={selectedAdditionalTool} 
+                  onValueChange={setSelectedAdditionalTool}
+                  disabled={loading}
+                >
+                  <SelectTrigger className="flex-1">
+                    <SelectValue placeholder={loading ? "Loading tools..." : "Select additional tool"} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {aiTools
+                      .filter(tool => !formData.additional_tools.includes(tool.id) && tool.id !== formData.ai_tool_id)
+                      .map((tool) => (
+                        <SelectItem key={tool.id} value={tool.id}>
+                          {tool.name}
+                        </SelectItem>
+                      ))}
+                  </SelectContent>
+                </Select>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    if (selectedAdditionalTool && !formData.additional_tools.includes(selectedAdditionalTool)) {
+                      setFormData({
+                        ...formData,
+                        additional_tools: [...formData.additional_tools, selectedAdditionalTool],
+                      });
+                      setSelectedAdditionalTool('');
+                    }
+                  }}
+                  disabled={!selectedAdditionalTool}
+                >
+                  <Plus className="h-4 w-4" />
+                </Button>
               </div>
+              {formData.additional_tools.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {formData.additional_tools.map((toolId) => {
+                    const tool = aiTools.find(t => t.id === toolId);
+                    return (
+                      <Badge key={toolId} variant="secondary" className="flex items-center gap-1">
+                        {tool?.name}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setFormData({
+                              ...formData,
+                              additional_tools: formData.additional_tools.filter(id => id !== toolId),
+                            });
+                          }}
+                          className="ml-1 hover:bg-destructive/20 rounded-full p-0.5"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </Badge>
+                    );
+                  })}
+                </div>
+              )}
             </div>
 
             <div className="space-y-2">
