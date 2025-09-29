@@ -82,7 +82,7 @@ export default function AuthPage() {
           <img 
             src="/src/assets/loop-logo.png" 
             alt="LOOP Agencies" 
-            className="h-12 mx-auto mb-4"
+            className="h-16 mx-auto mb-4"
           />
           <CardTitle className="text-2xl">AI Tool Tracker</CardTitle>
           <CardDescription>
