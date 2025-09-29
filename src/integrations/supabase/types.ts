@@ -17,9 +17,11 @@ export type Database = {
       ai_entries: {
         Row: {
           ai_tool_id: string
+          conceptual_only: boolean
           created_at: string
           date: string
           file_url: string | null
+          final_used_asset: boolean
           id: string
           project_details: string
           prompt: string
@@ -29,9 +31,11 @@ export type Database = {
         }
         Insert: {
           ai_tool_id: string
+          conceptual_only?: boolean
           created_at?: string
           date: string
           file_url?: string | null
+          final_used_asset?: boolean
           id?: string
           project_details: string
           prompt: string
@@ -41,9 +45,11 @@ export type Database = {
         }
         Update: {
           ai_tool_id?: string
+          conceptual_only?: boolean
           created_at?: string
           date?: string
           file_url?: string | null
+          final_used_asset?: boolean
           id?: string
           project_details?: string
           prompt?: string
