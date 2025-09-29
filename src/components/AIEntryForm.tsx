@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { X } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Checkbox } from '@/components/ui/checkbox';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -42,6 +43,7 @@ export default function AIEntryForm({ onClose, onSave, entry }: AIEntryFormProps
     project_details: entry?.project_details || '',
     file_url: entry?.file_url || '',
   });
+  const [loopToolsAgreement, setLoopToolsAgreement] = useState<boolean>(false);
 
   useEffect(() => {
     fetchAITools();
@@ -70,6 +72,11 @@ export default function AIEntryForm({ onClose, onSave, entry }: AIEntryFormProps
     // Validation
     if (!formData.date || !formData.prompt || !formData.ai_tool_id || !formData.project_details) {
       toast.error('Please fill in all required fields');
+      return;
+    }
+
+    if (!loopToolsAgreement) {
+      toast.error('Please confirm that you are using approved LOOP tools');
       return;
     }
 
@@ -166,6 +173,17 @@ export default function AIEntryForm({ onClose, onSave, entry }: AIEntryFormProps
                 onChange={(e) => setFormData({ ...formData, file_url: e.target.value })}
                 placeholder="https://example.com/final-file"
               />
+            </div>
+
+            <div className="flex items-center space-x-2 pt-2">
+              <Checkbox 
+                id="loopAgreement"
+                checked={loopToolsAgreement}
+                onCheckedChange={(checked) => setLoopToolsAgreement(checked as boolean)}
+              />
+              <Label htmlFor="loopAgreement" className="text-sm leading-relaxed">
+                Please ensure you only use approved LOOP tools and are logged in through the LOOP logins not any personal accounts
+              </Label>
             </div>
 
             <div className="flex gap-3 pt-4">
