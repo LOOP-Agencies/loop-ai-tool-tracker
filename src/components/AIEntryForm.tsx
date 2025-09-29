@@ -19,6 +19,8 @@ interface AIEntry {
   prompt: string;
   ai_tool_id: string;
   project_details: string;
+  conceptual_only: boolean;
+  final_used_asset: boolean;
   file_url?: string;
 }
 
@@ -44,6 +46,8 @@ export default function AIEntryForm({ onClose, onSave, entry }: AIEntryFormProps
     prompt: entry?.prompt || '',
     ai_tool_id: entry?.ai_tool_id || '',
     project_details: entry?.project_details || '',
+    conceptual_only: entry?.conceptual_only || false,
+    final_used_asset: entry?.final_used_asset || false,
     file_url: entry?.file_url || '',
     additional_tools: [] as string[],
   });
@@ -92,6 +96,8 @@ export default function AIEntryForm({ onClose, onSave, entry }: AIEntryFormProps
       prompt: formData.prompt,
       ai_tool_id: formData.ai_tool_id,
       project_details: formData.project_details,
+      conceptual_only: formData.conceptual_only,
+      final_used_asset: formData.final_used_asset,
       file_url: formData.file_url || undefined,
     });
 
@@ -167,6 +173,30 @@ export default function AIEntryForm({ onClose, onSave, entry }: AIEntryFormProps
                 className="min-h-[100px]"
                 required
               />
+            </div>
+
+            <div className="space-y-3">
+              <div className="flex items-center space-x-2">
+                <Checkbox 
+                  id="conceptualOnly"
+                  checked={formData.conceptual_only}
+                  onCheckedChange={(checked) => setFormData({ ...formData, conceptual_only: checked as boolean })}
+                />
+                <Label htmlFor="conceptualOnly" className="text-sm">
+                  Conceptual only
+                </Label>
+              </div>
+              
+              <div className="flex items-center space-x-2">
+                <Checkbox 
+                  id="finalUsedAsset"
+                  checked={formData.final_used_asset}
+                  onCheckedChange={(checked) => setFormData({ ...formData, final_used_asset: checked as boolean })}
+                />
+                <Label htmlFor="finalUsedAsset" className="text-sm">
+                  Final used asset
+                </Label>
+              </div>
             </div>
 
             <div className="space-y-2">

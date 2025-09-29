@@ -20,6 +20,8 @@ interface AIEntry {
   ai_tool_id: string;
   ai_tool_name?: string;
   project_details: string;
+  conceptual_only: boolean;
+  final_used_asset: boolean;
   file_url?: string;
   user_id: string;
 }
@@ -115,7 +117,9 @@ export default function Index() {
       
       const entriesWithToolNames = data?.map(entry => ({
         ...entry,
-        title: entry.title || '', // Ensure title is never undefined
+        title: entry.title || '',
+        conceptual_only: entry.conceptual_only || false,
+        final_used_asset: entry.final_used_asset || false,
         ai_tool_name: entry.ai_tools?.name || 'Unknown Tool'
       })) || [];
       
@@ -160,6 +164,8 @@ export default function Index() {
             prompt: entryData.prompt,
             ai_tool_id: entryData.ai_tool_id,
             project_details: entryData.project_details,
+            conceptual_only: entryData.conceptual_only,
+            final_used_asset: entryData.final_used_asset,
             file_url: entryData.file_url,
           })
           .eq('id', editingEntry.id);

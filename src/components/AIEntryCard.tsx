@@ -11,6 +11,8 @@ interface AIEntry {
   ai_tool_id: string;
   ai_tool_name?: string;
   project_details: string;
+  conceptual_only: boolean;
+  final_used_asset: boolean;
   file_url?: string;
   user_id: string;
 }
