@@ -189,7 +189,16 @@ export default function Dashboard() {
               <CardTitle>Top Tools (Pie Chart)</CardTitle>
             </CardHeader>
             <CardContent className="flex items-center justify-center">
-              <ChartContainer config={{}} className="h-[300px] w-full">
+              <ChartContainer 
+                config={pieChartData.reduce((acc, item, index) => {
+                  acc[item.name] = {
+                    label: item.name,
+                    color: COLORS[index % COLORS.length],
+                  };
+                  return acc;
+                }, {} as any)}
+                className="h-[300px] w-full"
+              >
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
@@ -200,6 +209,7 @@ export default function Dashboard() {
                       outerRadius={80}
                       fill="hsl(var(--primary))"
                       dataKey="value"
+                      nameKey="name"
                     >
                       {pieChartData.map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
