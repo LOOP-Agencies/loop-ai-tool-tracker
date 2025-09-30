@@ -1,5 +1,5 @@
 import { Badge } from "@/components/ui/badge";
-import { Calendar } from "lucide-react";
+import { Calendar, ExternalLink } from "lucide-react";
 
 interface AIEntry {
   id: string;
@@ -47,6 +47,19 @@ export default function AIEntryListItem({ entry, onClick }: AIEntryListItemProps
         <Badge variant="secondary" className="bg-loop-lime/20 text-loop-lime">
           {entry.ai_tool_name || 'Unknown Tool'}
         </Badge>
+        
+        {entry.file_url && (
+          <a
+            href={entry.file_url}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
+            className="text-primary hover:text-primary/80 transition-smooth"
+            title="View final file"
+          >
+            <ExternalLink className="h-4 w-4" />
+          </a>
+        )}
       </div>
     </div>
   );
