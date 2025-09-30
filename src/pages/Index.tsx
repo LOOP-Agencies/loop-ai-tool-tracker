@@ -229,13 +229,25 @@ export default function Index() {
   };
 
   const handleSignOut = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
-      });
+    try {
+      const { error } = await supabase.auth.signOut({ scope: 'global' });
+      
+      // If the error is just about missing session, ignore it since we're signing out anyway
+      if (error && !error.message.includes('session')) {
+        toast({
+          title: "Error",
+          description: error.message,
+          variant: "destructive",
+        });
+      }
+      
+      // Clear local state
+      setUser(null);
+      setSession(null);
+      setIsAdmin(false);
+      setEntries([]);
+    } catch (error: any) {
+      console.error('Sign out error:', error);
     }
   };
 
