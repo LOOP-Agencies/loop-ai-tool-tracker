@@ -9,9 +9,10 @@ interface HeaderProps {
   onSignOut: () => void;
   isAdmin?: boolean;
   userName?: string;
+  showBackToEntries?: boolean;
 }
 
-export default function Header({ onAddEntry, onShowAdmin, onSignOut, isAdmin, userName }: HeaderProps) {
+export default function Header({ onAddEntry, onShowAdmin, onSignOut, isAdmin, userName, showBackToEntries }: HeaderProps) {
   const navigate = useNavigate();
   
   return (
@@ -36,14 +37,23 @@ export default function Header({ onAddEntry, onShowAdmin, onSignOut, isAdmin, us
                 Welcome, {userName}
               </span>
             )}
-            <Button onClick={onAddEntry} className="bg-loop-lime hover:bg-loop-lime/90 text-loop-charcoal">
-              <Plus className="h-4 w-4 mr-2" />
-              Add Entry
-            </Button>
-            <Button variant="outline" onClick={() => navigate('/dashboard')}>
-              <BarChart3 className="h-4 w-4 mr-2" />
-              Dashboard
-            </Button>
+            {showBackToEntries ? (
+              <Button onClick={onAddEntry} className="bg-loop-lime hover:bg-loop-lime/90 text-loop-charcoal">
+                <Plus className="h-4 w-4 mr-2" />
+                Back to Entries
+              </Button>
+            ) : (
+              <>
+                <Button onClick={onAddEntry} className="bg-loop-lime hover:bg-loop-lime/90 text-loop-charcoal">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Entry
+                </Button>
+                <Button variant="outline" onClick={() => navigate('/dashboard')}>
+                  <BarChart3 className="h-4 w-4 mr-2" />
+                  Dashboard
+                </Button>
+              </>
+            )}
             {isAdmin && onShowAdmin && (
               <Button variant="outline" onClick={onShowAdmin}>
                 <Settings className="h-4 w-4 mr-2" />

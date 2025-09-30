@@ -128,6 +128,7 @@ export default function Dashboard() {
         onAddEntry={() => navigate('/')}
         onSignOut={handleSignOut}
         userName={userName}
+        showBackToEntries={true}
       />
       
       <main className="container mx-auto px-6 py-8">
