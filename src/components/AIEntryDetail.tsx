@@ -36,7 +36,7 @@ export default function AIEntryDetail({ entry, onClose, onEdit }: AIEntryDetailP
 
   return (
     <Dialog open={!!entry} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto [&>button]:hidden">
         <DialogHeader>
           <div className="flex items-start justify-between">
             <DialogTitle className="text-2xl pr-8">{entry.title}</DialogTitle>
