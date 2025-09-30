@@ -5,6 +5,7 @@ import Header from '@/components/Header';
 import AIEntryForm from '@/components/AIEntryForm';
 import AIEntryCard from '@/components/AIEntryCard';
 import AIEntryListItem from '@/components/AIEntryListItem';
+import AIEntryDetail from '@/components/AIEntryDetail';
 import StatsCards from '@/components/StatsCards';
 import AdminPanel from '@/components/AdminPanel';
 import AuthPage from '@/components/AuthPage';
@@ -46,6 +47,7 @@ export default function Index() {
   const [showForm, setShowForm] = useState<boolean>(false);
   const [showAdmin, setShowAdmin] = useState<boolean>(false);
   const [editingEntry, setEditingEntry] = useState<AIEntry | null>(null);
+  const [selectedEntry, setSelectedEntry] = useState<AIEntry | null>(null);
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [filterTool, setFilterTool] = useState<string>('all');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
@@ -199,7 +201,12 @@ export default function Index() {
     }
   };
 
+  const handleViewEntry = (entry: AIEntry) => {
+    setSelectedEntry(entry);
+  };
+
   const handleEditEntry = (entry: AIEntry) => {
+    setSelectedEntry(null);
     setEditingEntry(entry);
     setShowForm(true);
   };
@@ -306,7 +313,7 @@ export default function Index() {
               <AIEntryCard
                 key={entry.id}
                 entry={entry}
-                onEdit={handleEditEntry}
+                onClick={handleViewEntry}
               />
             ))}
           </div>
@@ -316,7 +323,7 @@ export default function Index() {
               <AIEntryListItem
                 key={entry.id}
                 entry={entry}
-                onEdit={handleEditEntry}
+                onClick={handleViewEntry}
               />
             ))}
           </div>
@@ -355,6 +362,13 @@ export default function Index() {
       {showAdmin && isAdmin && (
         <AdminPanel onClose={() => setShowAdmin(false)} />
       )}
+
+      {/* Entry Detail Modal */}
+      <AIEntryDetail
+        entry={selectedEntry}
+        onClose={() => setSelectedEntry(null)}
+        onEdit={handleEditEntry}
+      />
     </div>
   );
 }

@@ -1,7 +1,6 @@
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Edit, ExternalLink, Calendar, Bot, FileText } from "lucide-react";
+import { Calendar, Bot, FileText } from "lucide-react";
 
 interface AIEntry {
   id: string;
@@ -19,10 +18,10 @@ interface AIEntry {
 
 interface AIEntryCardProps {
   entry: AIEntry;
-  onEdit: (entry: AIEntry) => void;
+  onClick: (entry: AIEntry) => void;
 }
 
-export default function AIEntryCard({ entry, onEdit }: AIEntryCardProps) {
+export default function AIEntryCard({ entry, onClick }: AIEntryCardProps) {
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
@@ -32,7 +31,10 @@ export default function AIEntryCard({ entry, onEdit }: AIEntryCardProps) {
   };
 
   return (
-    <Card className="border border-border hover:shadow-soft transition-smooth group">
+    <Card 
+      className="border border-border hover:shadow-soft transition-smooth group cursor-pointer"
+      onClick={() => onClick(entry)}
+    >
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
           <div className="flex-1">
@@ -53,25 +55,6 @@ export default function AIEntryCard({ entry, onEdit }: AIEntryCardProps) {
                 </div>
               </div>
             </div>
-          </div>
-          
-          <div className="flex items-center space-x-2 opacity-0 group-hover:opacity-100 transition-smooth">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => onEdit(entry)}
-            >
-              <Edit className="h-4 w-4" />
-            </Button>
-            {entry.file_url && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => window.open(entry.file_url, '_blank')}
-              >
-                <ExternalLink className="h-4 w-4" />
-              </Button>
-            )}
           </div>
         </div>
       </CardHeader>
@@ -94,19 +77,6 @@ export default function AIEntryCard({ entry, onEdit }: AIEntryCardProps) {
           </p>
         </div>
         
-        {entry.file_url && (
-          <div className="pt-2 border-t border-border">
-            <a
-              href={entry.file_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-sm text-primary hover:text-primary/80 transition-smooth flex items-center"
-            >
-              <ExternalLink className="h-4 w-4 mr-1" />
-              View Final File
-            </a>
-          </div>
-        )}
       </CardContent>
     </Card>
   );

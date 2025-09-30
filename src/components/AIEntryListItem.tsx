@@ -1,6 +1,5 @@
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Edit, Calendar } from "lucide-react";
+import { Calendar } from "lucide-react";
 
 interface AIEntry {
   id: string;
@@ -18,10 +17,10 @@ interface AIEntry {
 
 interface AIEntryListItemProps {
   entry: AIEntry;
-  onEdit: (entry: AIEntry) => void;
+  onClick: (entry: AIEntry) => void;
 }
 
-export default function AIEntryListItem({ entry, onEdit }: AIEntryListItemProps) {
+export default function AIEntryListItem({ entry, onClick }: AIEntryListItemProps) {
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
@@ -31,7 +30,10 @@ export default function AIEntryListItem({ entry, onEdit }: AIEntryListItemProps)
   };
 
   return (
-    <div className="flex items-center justify-between p-4 border border-border rounded-lg hover:shadow-soft transition-smooth group bg-card">
+    <div 
+      className="flex items-center justify-between p-4 border border-border rounded-lg hover:shadow-soft transition-smooth group bg-card cursor-pointer"
+      onClick={() => onClick(entry)}
+    >
       <div className="flex items-center gap-6 flex-1">
         <div className="flex items-center gap-2 text-sm text-muted-foreground min-w-[120px]">
           <Calendar className="h-4 w-4" />
@@ -46,15 +48,6 @@ export default function AIEntryListItem({ entry, onEdit }: AIEntryListItemProps)
           {entry.ai_tool_name || 'Unknown Tool'}
         </Badge>
       </div>
-      
-      <Button
-        variant="outline"
-        size="sm"
-        onClick={() => onEdit(entry)}
-        className="opacity-0 group-hover:opacity-100 transition-smooth"
-      >
-        <Edit className="h-4 w-4" />
-      </Button>
     </div>
   );
 }
