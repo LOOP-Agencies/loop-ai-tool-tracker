@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button';
-import { Plus, Settings, LogOut, BarChart3 } from 'lucide-react';
+import { Plus, Settings, LogOut, BarChart3, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import loopLogo from "@/assets/loop-logo.png";
 
@@ -38,8 +38,8 @@ export default function Header({ onAddEntry, onShowAdmin, onSignOut, isAdmin, us
               </span>
             )}
             {showBackToEntries ? (
-              <Button onClick={onAddEntry} className="bg-loop-lime hover:bg-loop-lime/90 text-loop-charcoal">
-                <Plus className="h-4 w-4 mr-2" />
+              <Button variant="outline" onClick={onAddEntry}>
+                <ArrowLeft className="h-4 w-4 mr-2" />
                 Back to Entries
               </Button>
             ) : (
