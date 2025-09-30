@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button';
-import { Plus, Settings, LogOut } from 'lucide-react';
+import { Plus, Settings, LogOut, BarChart3 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import loopLogo from "@/assets/loop-logo.png";
 
 interface HeaderProps {
@@ -11,6 +12,8 @@ interface HeaderProps {
 }
 
 export default function Header({ onAddEntry, onShowAdmin, onSignOut, isAdmin, userName }: HeaderProps) {
+  const navigate = useNavigate();
+  
   return (
     <header className="bg-card border-b border-border shadow-soft">
       <div className="container mx-auto px-6 py-4">
@@ -36,6 +39,10 @@ export default function Header({ onAddEntry, onShowAdmin, onSignOut, isAdmin, us
             <Button onClick={onAddEntry} className="bg-loop-lime hover:bg-loop-lime/90 text-loop-charcoal">
               <Plus className="h-4 w-4 mr-2" />
               Add Entry
+            </Button>
+            <Button variant="outline" onClick={() => navigate('/dashboard')}>
+              <BarChart3 className="h-4 w-4 mr-2" />
+              Dashboard
             </Button>
             {isAdmin && onShowAdmin && (
               <Button variant="outline" onClick={onShowAdmin}>
