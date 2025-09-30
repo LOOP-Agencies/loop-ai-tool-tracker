@@ -141,17 +141,18 @@ export default function Dashboard() {
             <CardHeader>
               <CardTitle>Tool Usage Distribution</CardTitle>
             </CardHeader>
-            <CardContent>
-              <ChartContainer config={{}} className="h-[300px]">
+            <CardContent className="pt-6">
+              <ChartContainer config={{}} className="h-[350px]">
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={barChartData} margin={{ top: 10, right: 10, bottom: 50, left: 10 }}>
+                  <BarChart data={barChartData} margin={{ top: 10, right: 10, bottom: 70, left: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
                     <XAxis 
                       dataKey="name" 
                       className="text-xs" 
                       angle={-45}
                       textAnchor="end"
-                      height={80}
+                      height={70}
+                      interval={0}
                     />
                     <YAxis />
                     <ChartTooltip content={<ChartTooltipContent />} />
