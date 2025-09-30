@@ -28,6 +28,7 @@ interface AIEntry {
   final_used_asset: boolean;
   file_url?: string;
   user_id: string;
+  user_name?: string;
 }
 
 interface AITool {
@@ -109,7 +110,7 @@ export default function Index() {
 
   const fetchEntries = async () => {
     try {
-      const { data, error } = await supabase
+      const { data: entriesData, error: entriesError } = await supabase
         .from('ai_entries')
         .select(`
           *,
@@ -119,14 +120,30 @@ export default function Index() {
         `)
         .order('date', { ascending: false });
 
-      if (error) throw error;
+      if (entriesError) throw entriesError;
+
+      // Fetch profiles separately
+      const { data: profilesData, error: profilesError } = await supabase
+        .from('profiles')
+        .select('user_id, full_name, email');
+
+      if (profilesError) throw profilesError;
+
+      // Create a map of user_id to profile
+      const profilesMap = new Map(
+        profilesData?.map(profile => [
+          profile.user_id, 
+          profile.full_name || profile.email || 'Unknown User'
+        ])
+      );
       
-      const entriesWithToolNames = data?.map(entry => ({
+      const entriesWithToolNames = entriesData?.map(entry => ({
         ...entry,
         title: entry.title || '',
         conceptual_only: entry.conceptual_only || false,
         final_used_asset: entry.final_used_asset || false,
-        ai_tool_name: entry.ai_tools?.name || 'Unknown Tool'
+        ai_tool_name: entry.ai_tools?.name || 'Unknown Tool',
+        user_name: profilesMap.get(entry.user_id) || 'Unknown User'
       })) || [];
       
       setEntries(entriesWithToolNames);

@@ -15,6 +15,7 @@ interface AIEntry {
   final_used_asset: boolean;
   file_url?: string;
   user_id: string;
+  user_name?: string;
 }
 
 interface AIEntryDetailProps {

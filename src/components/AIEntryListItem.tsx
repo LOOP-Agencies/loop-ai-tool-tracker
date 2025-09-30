@@ -13,6 +13,7 @@ interface AIEntry {
   final_used_asset: boolean;
   file_url?: string;
   user_id: string;
+  user_name?: string;
 }
 
 interface AIEntryListItemProps {
@@ -40,9 +41,16 @@ export default function AIEntryListItem({ entry, onClick }: AIEntryListItemProps
           {formatDate(entry.date)}
         </div>
         
-        <h3 className="text-base font-semibold text-foreground flex-1">
-          {entry.title}
-        </h3>
+        <div className="flex-1">
+          <h3 className="text-base font-semibold text-foreground">
+            {entry.title}
+          </h3>
+          {entry.user_name && (
+            <p className="text-xs text-muted-foreground mt-1">
+              Submitted by {entry.user_name}
+            </p>
+          )}
+        </div>
         
         <Badge variant="secondary" className="bg-loop-lime/20 text-loop-lime">
           {entry.ai_tool_name || 'Unknown Tool'}

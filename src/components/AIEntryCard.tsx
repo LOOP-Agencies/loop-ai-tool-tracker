@@ -14,6 +14,7 @@ interface AIEntry {
   final_used_asset: boolean;
   file_url?: string;
   user_id: string;
+  user_name?: string;
 }
 
 interface AIEntryCardProps {
@@ -38,9 +39,14 @@ export default function AIEntryCard({ entry, onClick }: AIEntryCardProps) {
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
           <div className="flex-1">
-            <h3 className="text-lg font-semibold text-foreground mb-3">
+            <h3 className="text-lg font-semibold text-foreground mb-1">
               {entry.title}
             </h3>
+            {entry.user_name && (
+              <p className="text-xs text-muted-foreground mb-3">
+                Submitted by {entry.user_name}
+              </p>
+            )}
             <div className="flex items-center space-x-3">
               <div className="p-2 bg-primary/10 rounded-lg">
                 <Bot className="h-5 w-5 text-primary" />
