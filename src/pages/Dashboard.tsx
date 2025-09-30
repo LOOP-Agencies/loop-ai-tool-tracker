@@ -144,9 +144,15 @@ export default function Dashboard() {
             <CardContent>
               <ChartContainer config={{}} className="h-[300px]">
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={barChartData}>
+                  <BarChart data={barChartData} margin={{ top: 10, right: 10, bottom: 50, left: 10 }}>
                     <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                    <XAxis dataKey="name" className="text-xs" />
+                    <XAxis 
+                      dataKey="name" 
+                      className="text-xs" 
+                      angle={-45}
+                      textAnchor="end"
+                      height={80}
+                    />
                     <YAxis />
                     <ChartTooltip content={<ChartTooltipContent />} />
                     <Bar dataKey="value">
