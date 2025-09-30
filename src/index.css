@@ -48,17 +48,17 @@ All colors MUST be HSL.
 
     --radius: 0.5rem;
 
-    /* Chart Colors */
-    --chart-1: 221 83% 53%;   /* Blue */
-    --chart-2: 142 76% 36%;   /* Green */
-    --chart-3: 262 83% 58%;   /* Purple */
-    --chart-4: 346 77% 50%;   /* Red/Pink */
-    --chart-5: 38 92% 50%;    /* Orange */
-    --chart-6: 280 87% 65%;   /* Magenta */
-    --chart-7: 173 80% 40%;   /* Teal */
-    --chart-8: 45 93% 47%;    /* Yellow */
-    --chart-9: 10 79% 57%;    /* Coral */
-    --chart-10: 199 89% 48%;  /* Cyan */
+    /* Chart Colors - Bright & Vibrant */
+    --chart-1: 221 83% 65%;   /* Bright Blue */
+    --chart-2: 142 76% 50%;   /* Bright Green */
+    --chart-3: 262 83% 68%;   /* Bright Purple */
+    --chart-4: 346 77% 62%;   /* Bright Pink */
+    --chart-5: 38 92% 60%;    /* Bright Orange */
+    --chart-6: 280 87% 72%;   /* Bright Magenta */
+    --chart-7: 173 80% 55%;   /* Bright Teal */
+    --chart-8: 45 93% 58%;    /* Bright Yellow */
+    --chart-9: 10 79% 65%;    /* Bright Coral */
+    --chart-10: 199 89% 60%;  /* Bright Cyan */
 
     --sidebar-background: 0 0% 98%;
 
