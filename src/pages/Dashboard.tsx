@@ -101,7 +101,20 @@ export default function Dashboard() {
     count
   }));
 
-  const COLORS = ['hsl(var(--primary))', 'hsl(var(--loop-lime))', 'hsl(var(--accent))', 'hsl(var(--secondary))', 'hsl(var(--muted))', 'hsl(var(--chart-1))'];
+  const COLORS = [
+    'hsl(var(--primary))', 
+    'hsl(var(--loop-lime))', 
+    'hsl(var(--accent))', 
+    'hsl(var(--secondary))',
+    'hsl(var(--chart-1))',
+    'hsl(var(--chart-2))',
+    'hsl(var(--chart-3))',
+    'hsl(var(--chart-4))',
+    'hsl(var(--chart-5))',
+    '#8B5CF6', // purple
+    '#EC4899', // pink
+    '#F59E0B', // amber
+  ];
 
   if (loading) {
     return (
@@ -138,7 +151,11 @@ export default function Dashboard() {
                     <XAxis dataKey="name" className="text-xs" />
                     <YAxis />
                     <ChartTooltip content={<ChartTooltipContent />} />
-                    <Bar dataKey="value" fill="hsl(var(--primary))" />
+                    <Bar dataKey="value">
+                      {barChartData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      ))}
+                    </Bar>
                   </BarChart>
                 </ResponsiveContainer>
               </ChartContainer>
@@ -187,7 +204,7 @@ export default function Dashboard() {
                   <XAxis dataKey="month" className="text-xs" />
                   <YAxis />
                   <ChartTooltip content={<ChartTooltipContent />} />
-                  <Line type="monotone" dataKey="count" stroke="hsl(var(--primary))" strokeWidth={2} />
+                  <Line type="monotone" dataKey="count" stroke="hsl(var(--loop-lime))" strokeWidth={3} dot={{ fill: 'hsl(var(--primary))', r: 5 }} />
                 </LineChart>
               </ResponsiveContainer>
             </ChartContainer>
