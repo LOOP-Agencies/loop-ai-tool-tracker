@@ -188,8 +188,8 @@ export default function Dashboard() {
             <CardHeader>
               <CardTitle>Top Tools (Pie Chart)</CardTitle>
             </CardHeader>
-            <CardContent>
-              <ChartContainer config={{}} className="h-[300px]">
+            <CardContent className="flex items-center justify-center">
+              <ChartContainer config={{}} className="h-[300px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
@@ -197,8 +197,8 @@ export default function Dashboard() {
                       cx="50%"
                       cy="50%"
                       labelLine={false}
-                      label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                      outerRadius={80}
+                      label={({ name, percent, index }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                      outerRadius={90}
                       fill="hsl(var(--primary))"
                       dataKey="value"
                     >
