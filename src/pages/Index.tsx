@@ -4,11 +4,14 @@ import { supabase } from '@/integrations/supabase/client';
 import Header from '@/components/Header';
 import AIEntryForm from '@/components/AIEntryForm';
 import AIEntryCard from '@/components/AIEntryCard';
+import AIEntryListItem from '@/components/AIEntryListItem';
 import StatsCards from '@/components/StatsCards';
 import AdminPanel from '@/components/AdminPanel';
 import AuthPage from '@/components/AuthPage';
 import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { LayoutGrid, List } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 
 // Types
@@ -45,6 +48,7 @@ export default function Index() {
   const [editingEntry, setEditingEntry] = useState<AIEntry | null>(null);
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [filterTool, setFilterTool] = useState<string>('all');
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [loading, setLoading] = useState<boolean>(true);
   
   const { toast } = useToast();
@@ -252,7 +256,7 @@ export default function Index() {
         {/* Stats Cards */}
         <StatsCards entries={entries} />
         
-        {/* Search and Filter Controls */}
+        {/* Search, Filter, and View Controls */}
         <div className="mb-8 flex flex-col sm:flex-row gap-4">
           <div className="flex-1">
             <Input
@@ -277,18 +281,46 @@ export default function Index() {
               </SelectContent>
             </Select>
           </div>
+          <div className="flex gap-2">
+            <Button
+              variant={viewMode === 'grid' ? 'default' : 'outline'}
+              size="icon"
+              onClick={() => setViewMode('grid')}
+            >
+              <LayoutGrid className="h-4 w-4" />
+            </Button>
+            <Button
+              variant={viewMode === 'list' ? 'default' : 'outline'}
+              size="icon"
+              onClick={() => setViewMode('list')}
+            >
+              <List className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
 
-        {/* Entries Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredEntries.map((entry) => (
-            <AIEntryCard
-              key={entry.id}
-              entry={entry}
-              onEdit={handleEditEntry}
-            />
-          ))}
-        </div>
+        {/* Entries Display */}
+        {viewMode === 'grid' ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredEntries.map((entry) => (
+              <AIEntryCard
+                key={entry.id}
+                entry={entry}
+                onEdit={handleEditEntry}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="flex flex-col gap-3">
+            {filteredEntries.map((entry) => (
+              <AIEntryListItem
+                key={entry.id}
+                entry={entry}
+                onEdit={handleEditEntry}
+              />
+            ))}
+          </div>
+        )}
 
         {/* Empty State */}
         {filteredEntries.length === 0 && (
