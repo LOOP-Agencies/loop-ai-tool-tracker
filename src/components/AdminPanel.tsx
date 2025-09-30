@@ -24,6 +24,7 @@ interface User {
   email: string;
   full_name: string | null;
   created_at: string;
+  is_admin: boolean;
 }
 
 interface AdminPanelProps {
@@ -141,13 +142,30 @@ export default function AdminPanel({ onClose }: AdminPanelProps) {
 
   const fetchUsers = async () => {
     try {
-      const { data, error } = await supabase
+      const { data: profilesData, error: profilesError } = await supabase
         .from('profiles')
-        .select('id, email, full_name, created_at')
+        .select('id, email, full_name, created_at, user_id')
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
-      setUsers(data || []);
+      if (profilesError) throw profilesError;
+
+      // Fetch user roles
+      const { data: rolesData, error: rolesError } = await supabase
+        .from('user_roles')
+        .select('user_id, role');
+
+      if (rolesError) throw rolesError;
+
+      // Combine profiles with roles
+      const usersWithRoles = (profilesData || []).map(profile => ({
+        id: profile.user_id,
+        email: profile.email || '',
+        full_name: profile.full_name,
+        created_at: profile.created_at,
+        is_admin: rolesData?.some(role => role.user_id === profile.user_id && role.role === 'admin') || false,
+      }));
+
+      setUsers(usersWithRoles);
     } catch (error: any) {
       toast({
         title: "Error",
@@ -200,6 +218,38 @@ export default function AdminPanel({ onClose }: AdminPanelProps) {
   const resetUserForm = () => {
     setShowUserForm(false);
     setUserFormData({ email: '', password: '', full_name: '' });
+  };
+
+  const handleToggleAdmin = async (userId: string, isCurrentlyAdmin: boolean) => {
+    try {
+      if (isCurrentlyAdmin) {
+        // Remove admin role
+        const { error } = await supabase
+          .from('user_roles')
+          .delete()
+          .eq('user_id', userId)
+          .eq('role', 'admin');
+
+        if (error) throw error;
+        toast({ title: "Success", description: "Admin role removed" });
+      } else {
+        // Add admin role
+        const { error } = await supabase
+          .from('user_roles')
+          .insert({ user_id: userId, role: 'admin' });
+
+        if (error) throw error;
+        toast({ title: "Success", description: "User promoted to admin" });
+      }
+      
+      fetchUsers();
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
   };
 
   if (loading) {
@@ -403,6 +453,7 @@ export default function AdminPanel({ onClose }: AdminPanelProps) {
                     <TableHead>Name</TableHead>
                     <TableHead>Email</TableHead>
                     <TableHead>Created At</TableHead>
+                    <TableHead>Admin</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -411,6 +462,15 @@ export default function AdminPanel({ onClose }: AdminPanelProps) {
                       <TableCell className="font-medium">{user.full_name || 'N/A'}</TableCell>
                       <TableCell>{user.email}</TableCell>
                       <TableCell>{new Date(user.created_at).toLocaleDateString()}</TableCell>
+                      <TableCell>
+                        <div className="flex items-center space-x-2">
+                          <Switch
+                            checked={user.is_admin}
+                            onCheckedChange={() => handleToggleAdmin(user.id, user.is_admin)}
+                          />
+                          <Label className="text-xs">{user.is_admin ? 'Admin' : 'User'}</Label>
+                        </div>
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
