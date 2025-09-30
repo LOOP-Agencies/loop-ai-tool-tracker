@@ -141,28 +141,26 @@ export default function Dashboard() {
             <CardHeader>
               <CardTitle>Tool Usage Distribution</CardTitle>
             </CardHeader>
-            <CardContent className="pt-6">
-              <ChartContainer config={{}} className="h-[350px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={barChartData} margin={{ top: 10, right: 10, bottom: 70, left: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                    <XAxis 
-                      dataKey="name" 
-                      className="text-xs" 
-                      angle={-45}
-                      textAnchor="end"
-                      height={70}
-                      interval={0}
-                    />
-                    <YAxis />
-                    <ChartTooltip content={<ChartTooltipContent />} />
-                    <Bar dataKey="value">
-                      {barChartData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                      ))}
-                    </Bar>
-                  </BarChart>
-                </ResponsiveContainer>
+            <CardContent className="p-4 overflow-hidden">
+              <ChartContainer config={{}} className="aspect-auto h-[300px]">
+                <BarChart data={barChartData} margin={{ top: 10, right: 10, bottom: 60, left: 10 }}>
+                  <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                  <XAxis 
+                    dataKey="name" 
+                    className="text-xs" 
+                    angle={-45}
+                    textAnchor="end"
+                    height={60}
+                    interval="preserveStartEnd"
+                  />
+                  <YAxis />
+                  <ChartTooltip content={<ChartTooltipContent />} />
+                  <Bar dataKey="value">
+                    {barChartData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Bar>
+                </BarChart>
               </ChartContainer>
             </CardContent>
           </Card>
