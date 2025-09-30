@@ -102,18 +102,16 @@ export default function Dashboard() {
   }));
 
   const COLORS = [
-    'hsl(var(--primary))', 
-    'hsl(var(--loop-lime))', 
-    'hsl(var(--accent))', 
-    'hsl(var(--secondary))',
-    'hsl(var(--chart-1))',
-    'hsl(var(--chart-2))',
-    'hsl(var(--chart-3))',
-    'hsl(var(--chart-4))',
-    'hsl(var(--chart-5))',
-    '#8B5CF6', // purple
-    '#EC4899', // pink
-    '#F59E0B', // amber
+    'hsl(var(--chart-1))',  // Blue
+    'hsl(var(--chart-2))',  // Green
+    'hsl(var(--chart-3))',  // Purple
+    'hsl(var(--chart-4))',  // Red/Pink
+    'hsl(var(--chart-5))',  // Orange
+    'hsl(var(--chart-6))',  // Magenta
+    'hsl(var(--chart-7))',  // Teal
+    'hsl(var(--chart-8))',  // Yellow
+    'hsl(var(--chart-9))',  // Coral
+    'hsl(var(--chart-10))', // Cyan
   ];
 
   if (loading) {

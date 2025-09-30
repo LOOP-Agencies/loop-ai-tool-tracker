@@ -48,6 +48,18 @@ All colors MUST be HSL.
 
     --radius: 0.5rem;
 
+    /* Chart Colors */
+    --chart-1: 221 83% 53%;   /* Blue */
+    --chart-2: 142 76% 36%;   /* Green */
+    --chart-3: 262 83% 58%;   /* Purple */
+    --chart-4: 346 77% 50%;   /* Red/Pink */
+    --chart-5: 38 92% 50%;    /* Orange */
+    --chart-6: 280 87% 65%;   /* Magenta */
+    --chart-7: 173 80% 40%;   /* Teal */
+    --chart-8: 45 93% 47%;    /* Yellow */
+    --chart-9: 10 79% 57%;    /* Coral */
+    --chart-10: 199 89% 48%;  /* Cyan */
+
     --sidebar-background: 0 0% 98%;
 
     --sidebar-foreground: 240 5.3% 26.1%;
