@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, PieChart, Pie, Cell, LineChart, Line, ResponsiveContainer } from 'recharts';
 import { Loader2 } from 'lucide-react';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 
 interface AIEntry {
   id: string;
@@ -19,6 +20,7 @@ export default function Dashboard() {
   const [entries, setEntries] = useState<AIEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [userName, setUserName] = useState<string>('');
+  const [timePeriod, setTimePeriod] = useState<'daily' | 'weekly' | 'monthly'>('daily');
 
   useEffect(() => {
     fetchData();
@@ -89,17 +91,33 @@ export default function Dashboard() {
     .sort((a, b) => b.value - a.value)
     .slice(0, 6);
 
-  // Monthly usage trend
-  const monthlyData = entries.reduce((acc, entry) => {
-    const month = new Date(entry.date).toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
-    acc[month] = (acc[month] || 0) + 1;
-    return acc;
-  }, {} as Record<string, number>);
+  // Time-based usage trend
+  const getTimeBasedData = () => {
+    const timeData = entries.reduce((acc, entry) => {
+      const date = new Date(entry.date);
+      let key: string;
+      
+      if (timePeriod === 'daily') {
+        key = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+      } else if (timePeriod === 'weekly') {
+        const weekStart = new Date(date);
+        weekStart.setDate(date.getDate() - date.getDay());
+        key = `Week of ${weekStart.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
+      } else {
+        key = date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+      }
+      
+      acc[key] = (acc[key] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
 
-  const lineChartData = Object.entries(monthlyData).map(([month, count]) => ({
-    month,
-    count
-  }));
+    return Object.entries(timeData).map(([period, count]) => ({
+      period,
+      count
+    }));
+  };
+
+  const lineChartData = getTimeBasedData();
 
   const COLORS = [
     'hsl(var(--chart-1))',  // Blue
@@ -197,15 +215,26 @@ export default function Dashboard() {
         </div>
 
         <Card>
-          <CardHeader>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
             <CardTitle>Usage Trend Over Time</CardTitle>
+            <ToggleGroup type="single" value={timePeriod} onValueChange={(value) => value && setTimePeriod(value as 'daily' | 'weekly' | 'monthly')}>
+              <ToggleGroupItem value="daily" aria-label="Daily view">
+                Daily
+              </ToggleGroupItem>
+              <ToggleGroupItem value="weekly" aria-label="Weekly view">
+                Weekly
+              </ToggleGroupItem>
+              <ToggleGroupItem value="monthly" aria-label="Monthly view">
+                Monthly
+              </ToggleGroupItem>
+            </ToggleGroup>
           </CardHeader>
           <CardContent>
             <ChartContainer config={{}} className="h-[300px]">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={lineChartData}>
                   <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                  <XAxis dataKey="month" className="text-xs" />
+                  <XAxis dataKey="period" className="text-xs" angle={timePeriod === 'daily' ? -45 : 0} textAnchor={timePeriod === 'daily' ? 'end' : 'middle'} height={timePeriod === 'daily' ? 80 : 30} />
                   <YAxis />
                   <ChartTooltip content={<ChartTooltipContent />} />
                   <Line type="monotone" dataKey="count" stroke="hsl(var(--loop-lime))" strokeWidth={3} dot={{ fill: 'hsl(var(--primary))', r: 5 }} />
