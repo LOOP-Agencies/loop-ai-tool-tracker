@@ -4,9 +4,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-
 import { useToast } from '@/components/ui/use-toast';
 import { Loader2 } from 'lucide-react';
+import logoImage from '@/assets/loop-logo.png';
 
 export default function AuthPage() {
   const [email, setEmail] = useState('');
@@ -46,7 +46,7 @@ export default function AuthPage() {
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <img 
-            src="/src/assets/loop-logo.png" 
+            src={logoImage} 
             alt="LOOP Agencies" 
             className="h-16 mx-auto mb-4"
           />
