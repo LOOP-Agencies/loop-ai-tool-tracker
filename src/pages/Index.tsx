@@ -286,6 +286,7 @@ export default function Index() {
         onSignOut={handleSignOut}
         isAdmin={isAdmin}
         userName={user.user_metadata?.full_name || user.email}
+        entries={entries}
       />
       
       <main className="container mx-auto px-6 py-8">
