@@ -18,6 +18,13 @@ interface AIEntry {
   user_name?: string;
 }
 
+interface AITool {
+  id: string;
+  name: string;
+  description: string | null;
+  is_active: boolean;
+}
+
 interface HeaderProps {
   onAddEntry: () => void;
   onShowAdmin?: () => void;
@@ -26,12 +33,13 @@ interface HeaderProps {
   userName?: string;
   showBackToEntries?: boolean;
   entries?: AIEntry[];
+  aiTools?: AITool[];
 }
 
-export default function Header({ onAddEntry, onShowAdmin, onSignOut, isAdmin, userName, showBackToEntries, entries = [] }: HeaderProps) {
+export default function Header({ onAddEntry, onShowAdmin, onSignOut, isAdmin, userName, showBackToEntries, entries = [], aiTools = [] }: HeaderProps) {
   const navigate = useNavigate();
 
-  const exportToCSV = () => {
+  const exportEntriesToCSV = () => {
     if (entries.length === 0) return;
 
     const headers = ['Date', 'Title', 'AI Tool', 'Project Details', 'Prompt', 'Conceptual Only', 'Final Used Asset', 'User', 'File URL'];
@@ -56,6 +64,30 @@ export default function Header({ onAddEntry, onShowAdmin, onSignOut, isAdmin, us
     const url = URL.createObjectURL(blob);
     link.setAttribute('href', url);
     link.setAttribute('download', `ai-entries-${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const exportToolsToCSV = () => {
+    if (aiTools.length === 0) return;
+
+    const headers = ['Name', 'Description', 'Active'];
+    
+    const csvContent = [
+      headers.join(','),
+      ...aiTools.map(tool => [
+        `"${(tool.name || '').replace(/"/g, '""')}"`,
+        `"${(tool.description || '').replace(/"/g, '""')}"`,
+        tool.is_active ? 'Yes' : 'No'
+      ].join(','))
+    ].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `ai-tools-${new Date().toISOString().split('T')[0]}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -99,9 +131,15 @@ export default function Header({ onAddEntry, onShowAdmin, onSignOut, isAdmin, us
                   Dashboard
                 </Button>
                 {entries.length > 0 && (
-                  <Button variant="outline" onClick={exportToCSV}>
+                  <Button variant="outline" onClick={exportEntriesToCSV}>
                     <Download className="h-4 w-4 mr-2" />
-                    Export CSV
+                    Export Entries
+                  </Button>
+                )}
+                {aiTools.length > 0 && (
+                  <Button variant="outline" onClick={exportToolsToCSV}>
+                    <Download className="h-4 w-4 mr-2" />
+                    Export Tools
                   </Button>
                 )}
               </>

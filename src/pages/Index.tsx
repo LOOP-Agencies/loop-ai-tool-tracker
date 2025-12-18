@@ -287,6 +287,7 @@ export default function Index() {
         isAdmin={isAdmin}
         userName={user.user_metadata?.full_name || user.email}
         entries={entries}
+        aiTools={aiTools}
       />
       
       <main className="container mx-auto px-6 py-8">
